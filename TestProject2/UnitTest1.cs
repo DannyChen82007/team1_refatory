@@ -63,7 +63,7 @@ namespace TestProject2
 
             var service = new BudgetService(_budgetRepo);
 
-            var result = service.Query(new DateTime(2022, 12, 16), new DateTime(2022, 12, 15));
+            var result = service.Query(new DateTime(2022, 12, 16), new DateTime(2022, 12, 14));
 
             Assert.AreEqual(0m, result);
         }

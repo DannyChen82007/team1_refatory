@@ -1,27 +1,29 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿#region
+
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+#endregion
 
 namespace TestProject2
 {
     public class BudgetService
     {
-        IBudgetRepo _budget;
+        readonly IBudgetRepo _budget;
+
         public BudgetService(IBudgetRepo budgetRepo)
         {
             _budget = budgetRepo;
-
-
         }
 
         public decimal Query(DateTime start, DateTime end)
         {
+            if (start > end)
+            {
+                return 0;
+            }
+
             var result = _budget.GetAll();
-
-
 
             var queryEnd = end.ToString("yyyyyMM");
 
@@ -56,31 +58,14 @@ namespace TestProject2
             return reuslt;
         }
 
-        public int GetMonth(DateTime start, DateTime end)
-        {
-            var mCount = 0;
-            var sYM = start.Year * 100 + start.Month;  //202202
-            var eYM = end.Year * 100 + end.Month;   //202302
-            while (sYM < eYM)
-            {
-                var YM = start.AddMonths(++mCount);
-                sYM = YM.Year * 100 + YM.Month;
-
-            }
-
-            return mCount;
-
-        }
-
         /// <summary>
-        /// 同年月跨日
+        ///     同年月跨日
         /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <returns></returns>
-        public decimal GetDayBudget(DateTime start, DateTime end)
+        private decimal GetDayBudget(DateTime start, DateTime end)
         {
-
             decimal result = 0;
 
             var queryStart = start.ToString("yyyyMM");
@@ -103,7 +88,20 @@ namespace TestProject2
             }
 
             return result;
+        }
 
+        private int GetMonth(DateTime start, DateTime end)
+        {
+            var mCount = 0;
+            var sYM = start.Year * 100 + start.Month; //202202
+            var eYM = end.Year * 100 + end.Month; //202302
+            while (sYM < eYM)
+            {
+                var YM = start.AddMonths(++mCount);
+                sYM = YM.Year * 100 + YM.Month;
+            }
+
+            return mCount;
         }
     }
 }
