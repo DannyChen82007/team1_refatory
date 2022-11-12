@@ -9,7 +9,8 @@ using NUnit.Framework;
 
 namespace TestProject2
 {
-    public class Tests
+    [TestFixture]
+    public class BudgetServiceTests
     {
         IBudgetRepo _budgetRepo;
         BudgetService service;
@@ -21,7 +22,7 @@ namespace TestProject2
         }
 
         [Test]
-        public void Test1()
+        public void query_whole_month()
         {
             var a = new List<Budget>()
                     {
@@ -41,21 +42,13 @@ namespace TestProject2
         }
 
         [Test]
-        public void 非法的()
+        public void invalid_period()
         {
             var a = new List<Budget>()
                     {
                         new Budget()
                         {
                             YearMonth = "202212", Amount = 3100
-                        },
-                        new Budget()
-                        {
-                            YearMonth = "202301", Amount = 310
-                        },
-                        new Budget()
-                        {
-                            YearMonth = "202302", Amount = 28
                         },
                     };
 
@@ -69,21 +62,13 @@ namespace TestProject2
         }
 
         [Test]
-        public void 查一天()
+        public void query_single_day()
         {
             var a = new List<Budget>()
                     {
                         new Budget()
                         {
                             YearMonth = "202212", Amount = 3100
-                        },
-                        new Budget()
-                        {
-                            YearMonth = "202301", Amount = 310
-                        },
-                        new Budget()
-                        {
-                            YearMonth = "202302", Amount = 28
                         },
                     };
 
@@ -97,7 +82,7 @@ namespace TestProject2
         }
 
         [Test]
-        public void 跨年()
+        public void cross_year()
         {
             var a = new List<Budget>()
                     {
@@ -121,7 +106,7 @@ namespace TestProject2
 
             var result = service.Query(new DateTime(2022, 12, 23), new DateTime(2023, 2, 12));
 
-            Assert.AreEqual(1222m, result);
+            Assert.AreEqual(900 + 310 + 12, result);
         }
     }
 }
