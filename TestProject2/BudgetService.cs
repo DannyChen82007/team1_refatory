@@ -23,39 +23,49 @@ namespace TestProject2
                 return 0;
             }
 
-            var result = _budget.GetAll();
-
-            var queryEnd = end.ToString("yyyyyMM");
-
-            decimal reuslt = 0;
-
-            if (start.Year == end.Year && start.Month == end.Month)
+            if (start.ToString("yyyyMM") == end.ToString("yyyyMM"))
             {
-                reuslt = GetDayBudget(start, end);
+                return GetDayBudget(start, end);
             }
-            else
-            {
-                int month = GetMonth(start, end);
 
-                for (int i = 0; i <= month; i++)
+            decimal result = 0;
+
+            var currentDate = start;
+            while (currentDate < new DateTime(end.Year, end.Month, 1).AddMonths(1))
+            {
+                var budget = this._budget.GetAll().FirstOrDefault(a => a.YearMonth == currentDate.ToString("yyyyMM"));
+
+                if (budget != null)
                 {
-                    if (i == 0)
+                    DateTime overlappingStart;
+                    DateTime overlappingEnd;
+                    if (budget.YearMonth == start.ToString("yyyyMM"))
                     {
-                        reuslt += GetDayBudget(start, new DateTime(start.Year, start.Month, 1).AddMonths(1).AddDays(-1));
+                        overlappingStart = start;
+                        overlappingEnd = new DateTime(start.Year, start.Month, 1).AddMonths(1).AddDays(-1);
                     }
-                    else if (i == month)
+                    else if (budget.YearMonth == end.ToString("yyyyMM"))
                     {
-                        reuslt += GetDayBudget(new DateTime(end.Year, end.Month, 1), end);
+                        overlappingStart = new DateTime(end.Year, end.Month, 1);
+                        overlappingEnd = end;
                     }
                     else
                     {
-                        var temp = start.AddMonths(i);
-                        reuslt += GetDayBudget(new DateTime(temp.Year, temp.Month, 1), new DateTime(temp.Year, temp.Month, 1).AddMonths(1).AddDays(-1));
+                        overlappingStart = budget.FirstDay();
+                        overlappingEnd = budget.LastDay(); 
                     }
+                    
+                    decimal diffStart = (overlappingEnd.Date - overlappingStart.Date).Days + 1; // 同年月跨日
+
+                    var daysInMonth = DateTime.DaysInMonth(currentDate.Year, currentDate.Month); // 當月有幾天
+                    
+                    result += diffStart * budget.Amount / daysInMonth;
                 }
+
+                currentDate = currentDate.AddMonths(1);
             }
 
-            return reuslt;
+            return result;
         }
 
         /// <summary>
@@ -66,42 +76,21 @@ namespace TestProject2
         /// <returns></returns>
         private decimal GetDayBudget(DateTime start, DateTime end)
         {
-            decimal result = 0;
+            //decimal result = 0;
 
-            var queryStart = start.ToString("yyyyMM");
+            decimal diffStart = (end.Date - start.Date).Days + 1; // 同年月跨日
 
-            var diff = end.Date - start.Date;
+            var daysInMonth = DateTime.DaysInMonth(start.Year, start.Month); // 當月有幾天
 
-            decimal diffStart = diff.Days + 1; // 同年月跨日
+            var budget = this._budget.GetAll().FirstOrDefault(a => a.YearMonth == start.ToString("yyyyMM"));
 
-            var monthsday = DateTime.DaysInMonth(start.Year, start.Month); // 當月有幾天
-
-            var budgetResult = _budget.GetAll().FirstOrDefault(a => a.YearMonth == queryStart);
-
-            if (budgetResult != null)
+            if (budget != null)
             {
-                result = (diffStart * budgetResult.Amount / monthsday);
-            }
-            else
-            {
-                result = 0;
+                return (diffStart * budget.Amount / daysInMonth);
             }
 
-            return result;
-        }
+            return 0;
 
-        private int GetMonth(DateTime start, DateTime end)
-        {
-            var mCount = 0;
-            var sYM = start.Year * 100 + start.Month; //202202
-            var eYM = end.Year * 100 + end.Month; //202302
-            while (sYM < eYM)
-            {
-                var YM = start.AddMonths(++mCount);
-                sYM = YM.Year * 100 + YM.Month;
-            }
-
-            return mCount;
         }
     }
 }

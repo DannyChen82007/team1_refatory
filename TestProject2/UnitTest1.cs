@@ -36,7 +36,8 @@ namespace TestProject2
 
             var service = new BudgetService(_budgetRepo);
 
-            var result = service.Query(new DateTime(2022, 12, 01), new DateTime(2022, 12, 31));
+            DateTime start = new DateTime(2022, 12, 01);
+            var result = service.Query(start, new DateTime(2022, 12, 31));
 
             Assert.AreEqual(3100m, result);
         }
@@ -56,7 +57,8 @@ namespace TestProject2
 
             var service = new BudgetService(_budgetRepo);
 
-            var result = service.Query(new DateTime(2022, 12, 16), new DateTime(2022, 12, 14));
+            DateTime start = new DateTime(2022, 12, 16);
+            var result = service.Query(start, new DateTime(2022, 12, 14));
 
             Assert.AreEqual(0m, result);
         }
@@ -76,7 +78,8 @@ namespace TestProject2
 
             var service = new BudgetService(_budgetRepo);
 
-            var result = service.Query(new DateTime(2022, 12, 15), new DateTime(2022, 12, 15));
+            DateTime start = new DateTime(2022, 12, 15);
+            var result = service.Query(start, new DateTime(2022, 12, 15));
 
             Assert.AreEqual(100m, result);
         }
@@ -104,7 +107,8 @@ namespace TestProject2
 
             var service = new BudgetService(_budgetRepo);
 
-            var result = service.Query(new DateTime(2022, 12, 23), new DateTime(2023, 2, 12));
+            DateTime start = new DateTime(2022, 12, 23);
+            var result = service.Query(start, new DateTime(2023, 2, 12));
 
             Assert.AreEqual(900 + 310 + 12, result);
         }
